@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Project, VisualMetricQueryEditor, AliasBy } from '.';
-import { MetricQuery, MetricDescriptor, EditorMode, Preprocessing } from '../types';
+import { MetricQuery, MetricDescriptor, EditorMode, Preprocessing, MetricKind } from '../types';
 import { getAlignmentPickerData } from '../functions';
 import CloudMonitoringDatasource from '../datasource';
 import { SelectableValue } from '@grafana/data';
@@ -29,7 +29,7 @@ export const defaultQuery: (dataSource: CloudMonitoringDatasource) => MetricQuer
   editorMode: EditorMode.Visual,
   projectName: dataSource.getDefaultProject(),
   metricType: '',
-  metricKind: '',
+  metricKind: MetricKind.GAUGE,
   valueType: '',
   unit: '',
   crossSeriesReducer: 'REDUCE_MEAN',

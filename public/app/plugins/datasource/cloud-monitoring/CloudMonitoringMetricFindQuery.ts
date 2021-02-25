@@ -1,7 +1,7 @@
 import isString from 'lodash/isString';
-import { alignmentPeriods, MetricKind, selectors, ValueTypes } from './constants';
+import { alignmentPeriods, selectors } from './constants';
 import CloudMonitoringDatasource from './datasource';
-import { CloudMonitoringVariableQuery, MetricFindQueryTypes } from './types';
+import { CloudMonitoringVariableQuery, MetricFindQueryTypes, MetricKind, ValueTypes } from './types';
 import { SelectableValue } from '@grafana/data';
 import {
   extractServicesFromMetricDescriptors,

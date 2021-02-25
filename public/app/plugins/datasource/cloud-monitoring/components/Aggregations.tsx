@@ -4,8 +4,7 @@ import _ from 'lodash';
 import { SelectableValue } from '@grafana/data';
 import { Segment, Icon } from '@grafana/ui';
 import { getAggregationOptionsByMetric } from '../functions';
-import { ValueTypes, MetricKind } from '../constants';
-import { MetricDescriptor } from '../types';
+import { MetricDescriptor, ValueTypes, MetricKind } from '../types';
 
 export interface Props {
   onChange: (metricDescriptor: string) => void;

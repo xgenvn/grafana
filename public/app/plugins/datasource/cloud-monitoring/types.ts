@@ -69,7 +69,24 @@ export enum Preprocessing {
   Delta = 'delta',
 }
 
-export const proprocessors = [
+export enum MetricKind {
+  METRIC_KIND_UNSPECIFIED = 'METRIC_KIND_UNSPECIFIED',
+  GAUGE = 'GAUGE',
+  DELTA = 'DELTA',
+  CUMULATIVE = 'CUMULATIVE',
+}
+
+export enum ValueTypes {
+  VALUE_TYPE_UNSPECIFIED = 'VALUE_TYPE_UNSPECIFIED',
+  BOOL = 'BOOL',
+  INT64 = 'INT64',
+  DOUBLE = 'DOUBLE',
+  STRING = 'STRING',
+  DISTRIBUTION = 'DISTRIBUTION',
+  MONEY = 'MONEY',
+}
+
+export const preprocessors = [
   { label: 'None', value: Preprocessing.None },
   {
     label: 'Rate',
@@ -95,7 +112,7 @@ export interface MetricQuery {
   groupBys?: string[];
   filters?: string[];
   aliasBy?: string;
-  metricKind?: string;
+  metricKind?: MetricKind;
   valueType?: string;
   view?: string;
   query: string;
@@ -135,7 +152,7 @@ export interface AnnotationTarget {
   metricType: string;
   refId: string;
   filters: string[];
-  metricKind: string;
+  metricKind: MetricKind;
   valueType: string;
   title: string;
   text: string;
@@ -152,7 +169,7 @@ export interface QueryMeta {
 
 export interface MetricDescriptor {
   valueType: string;
-  metricKind: string;
+  metricKind: MetricKind;
   type: string;
   unit: string;
   service: string;

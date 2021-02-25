@@ -1,9 +1,9 @@
 import _ from 'lodash';
-import { alignOptions, aggOptions, ValueTypes, MetricKind, systemLabels } from './constants';
+import { alignOptions, aggOptions, systemLabels } from './constants';
 import { SelectableValue } from '@grafana/data';
 import CloudMonitoringDatasource from './datasource';
 import { TemplateSrv } from '@grafana/runtime';
-import { MetricDescriptor, Filter, MetricQuery } from './types';
+import { MetricDescriptor, Filter, MetricQuery, ValueTypes, MetricKind } from './types';
 
 export const extractServicesFromMetricDescriptors = (metricDescriptors: MetricDescriptor[]) =>
   _.uniqBy(metricDescriptors, 'service');

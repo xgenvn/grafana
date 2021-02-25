@@ -1,19 +1,4 @@
-export enum MetricKind {
-  METRIC_KIND_UNSPECIFIED = 'METRIC_KIND_UNSPECIFIED',
-  GAUGE = 'GAUGE',
-  DELTA = 'DELTA',
-  CUMULATIVE = 'CUMULATIVE',
-}
-
-export enum ValueTypes {
-  VALUE_TYPE_UNSPECIFIED = 'VALUE_TYPE_UNSPECIFIED',
-  BOOL = 'BOOL',
-  INT64 = 'INT64',
-  DOUBLE = 'DOUBLE',
-  STRING = 'STRING',
-  DISTRIBUTION = 'DISTRIBUTION',
-  MONEY = 'MONEY',
-}
+import { MetricKind, ValueTypes } from './types';
 
 export const alignOptions = [
   {

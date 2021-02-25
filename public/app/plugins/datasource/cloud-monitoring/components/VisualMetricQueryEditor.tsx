@@ -1,6 +1,6 @@
 import React from 'react';
 import { Aggregations, Metrics, LabelFilter, GroupBys, Alignments, AlignmentPeriods } from '.';
-import { MetricQuery, MetricDescriptor, Preprocessing, proprocessors } from '../types';
+import { MetricQuery, MetricDescriptor, Preprocessing, MetricKind } from '../types';
 import { getAlignmentPickerData } from '../functions';
 import CloudMonitoringDatasource from '../datasource';
 import { SelectableValue } from '@grafana/data';
@@ -62,13 +62,30 @@ function Editor({
                 <>
                   <div className="gf-form offset-width-9">
                     <VerticalGroup>
-                      <InlineField label="Pre-processing">
-                        <RadioButtonGroup
-                          onChange={(preprocessing) => onChange({ ...query, preprocessing })}
-                          value={query.preprocessing ?? Preprocessing.None}
-                          options={proprocessors}
-                        ></RadioButtonGroup>
-                      </InlineField>
+                      {(metric?.metricKind === MetricKind.DELTA || metric?.metricKind === MetricKind.CUMULATIVE) && (
+                        <InlineField label="Pre-processing">
+                          <RadioButtonGroup
+                            onChange={(preprocessing) => onChange({ ...query, preprocessing })}
+                            value={query.preprocessing ?? Preprocessing.None}
+                            options={[
+                              ...[
+                                { label: 'None', value: Preprocessing.None },
+                                {
+                                  label: 'Rate',
+                                  value: Preprocessing.Rate,
+                                  description: 'Data points are aligned and converted to a rate per time series',
+                                },
+                              ],
+                              metric?.metricKind === MetricKind.CUMULATIVE
+                                ? {
+                                    label: 'Delta',
+                                    value: Preprocessing.Delta,
+                                  }
+                                : [],
+                            ]}
+                          ></RadioButtonGroup>
+                        </InlineField>
+                      )}
                       {/* <div className="gf-form-inline"> */}
                       <Alignments
                         alignOptions={alignOptions}
