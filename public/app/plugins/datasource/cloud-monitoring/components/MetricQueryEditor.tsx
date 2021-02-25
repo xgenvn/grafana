@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Project, VisualMetricQueryEditor, AliasBy } from '.';
-import { MetricQuery, MetricDescriptor, EditorMode } from '../types';
+import { MetricQuery, MetricDescriptor, EditorMode, Preprocessing } from '../types';
 import { getAlignmentPickerData } from '../functions';
 import CloudMonitoringDatasource from '../datasource';
 import { SelectableValue } from '@grafana/data';
@@ -39,6 +39,7 @@ export const defaultQuery: (dataSource: CloudMonitoringDatasource) => MetricQuer
   filters: [],
   aliasBy: '',
   query: '',
+  preprocessing: Preprocessing.None,
 });
 
 function Editor({

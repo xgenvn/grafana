@@ -63,6 +63,22 @@ export enum EditorMode {
   MQL = 'mql',
 }
 
+export enum Preprocessing {
+  None = 'none',
+  Rate = 'rate',
+  Delta = 'delta',
+}
+
+export const proprocessors = [
+  { label: 'None', value: Preprocessing.None },
+  {
+    label: 'Rate',
+    value: Preprocessing.Rate,
+    description: 'Data points are aligned and converted to a rate per time series',
+  },
+  { label: 'Delta', value: Preprocessing.Delta },
+];
+
 export const queryTypes = [
   { label: 'Metrics', value: QueryType.METRICS },
   { label: 'Service Level Objectives (SLO)', value: QueryType.SLO },
@@ -83,6 +99,7 @@ export interface MetricQuery {
   valueType?: string;
   view?: string;
   query: string;
+  preprocessing?: Preprocessing;
 }
 
 export interface SLOQuery {

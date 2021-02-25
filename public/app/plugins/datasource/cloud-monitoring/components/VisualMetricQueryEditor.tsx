@@ -1,9 +1,10 @@
 import React from 'react';
 import { Aggregations, Metrics, LabelFilter, GroupBys, Alignments, AlignmentPeriods } from '.';
-import { MetricQuery, MetricDescriptor } from '../types';
+import { MetricQuery, MetricDescriptor, Preprocessing, proprocessors } from '../types';
 import { getAlignmentPickerData } from '../functions';
 import CloudMonitoringDatasource from '../datasource';
 import { SelectableValue } from '@grafana/data';
+import { InlineField, RadioButtonGroup, VerticalGroup } from '@grafana/ui';
 
 export interface Props {
   usedAlignmentPeriod?: number;
@@ -58,12 +59,27 @@ function Editor({
           >
             {(displayAdvancedOptions) =>
               displayAdvancedOptions && (
-                <Alignments
-                  alignOptions={alignOptions}
-                  templateVariableOptions={variableOptionGroup.options}
-                  perSeriesAligner={perSeriesAligner || ''}
-                  onChange={(perSeriesAligner) => onChange({ ...query, perSeriesAligner })}
-                />
+                <>
+                  <div className="gf-form offset-width-9">
+                    <VerticalGroup>
+                      <InlineField label="Pre-processing">
+                        <RadioButtonGroup
+                          onChange={(preprocessing) => onChange({ ...query, preprocessing })}
+                          value={query.preprocessing ?? Preprocessing.None}
+                          options={proprocessors}
+                        ></RadioButtonGroup>
+                      </InlineField>
+                      {/* <div className="gf-form-inline"> */}
+                      <Alignments
+                        alignOptions={alignOptions}
+                        templateVariableOptions={variableOptionGroup.options}
+                        perSeriesAligner={perSeriesAligner || ''}
+                        onChange={(perSeriesAligner) => onChange({ ...query, perSeriesAligner })}
+                      />
+                      {/* </div> */}
+                    </VerticalGroup>
+                  </div>
+                </>
               )
             }
           </Aggregations>
