@@ -4,19 +4,17 @@ import { Cascader, FieldSet, Field, Input, InputControl, stylesFactory, Select, 
 import { config } from 'app/core/config';
 import { css } from '@emotion/css';
 
-import { getAllDataSources } from '../../utils/config';
 import { fetchRulerRules } from '../../api/ruler';
 import { AlertRuleFormMethods } from './AlertRuleForm';
-import { getRulesDataSources } from '../../utils/datasource';
+import DataSourceSelect from '../DataSourceSelect';
 
 interface Props extends AlertRuleFormMethods {
   setFolder: ({ namespace, group }: { namespace: string; group: string }) => void;
 }
 
-enum ALERT_TYPE {
+export enum ALERT_TYPE {
   THRESHOLD = 'threshold',
   SYSTEM = 'system',
-  HOST = 'host',
 }
 
 const alertTypeOptions: SelectableValue[] = [
@@ -37,7 +35,6 @@ const AlertTypeSection: FC<Props> = ({ register, control, watch, setFolder, erro
 
   const alertType = watch('type') as SelectableValue;
   const datasource = watch('dataSource') as SelectableValue;
-  const dataSourceOptions = useDatasourceSelectOptions(alertType);
   const folderOptions = useFolderSelectOptions(datasource);
 
   return (
@@ -55,7 +52,7 @@ const AlertTypeSection: FC<Props> = ({ register, control, watch, setFolder, erro
           <InputControl as={Select} name="type" options={alertTypeOptions} control={control} />
         </Field>
         <Field className={styles.formInput} label="Select data source">
-          <InputControl as={Select} name="dataSource" options={dataSourceOptions} control={control} />
+          <DataSourceSelect control={control} alertType={alertType.value} />
         </Field>
       </div>
       <Field className={styles.formInput}>
@@ -75,30 +72,6 @@ const AlertTypeSection: FC<Props> = ({ register, control, watch, setFolder, erro
       </Field>
     </FieldSet>
   );
-};
-
-const useDatasourceSelectOptions = (alertType: SelectableValue) => {
-  const [datasourceOptions, setDataSourceOptions] = useState<SelectableValue[]>([]);
-
-  useEffect(() => {
-    let options = [] as ReturnType<typeof getAllDataSources>;
-    if (alertType?.value === ALERT_TYPE.THRESHOLD) {
-      options = getAllDataSources().filter(({ type }) => type !== 'datasource');
-    } else if (alertType?.value === ALERT_TYPE.SYSTEM) {
-      options = getRulesDataSources();
-    }
-    setDataSourceOptions(
-      options.map(({ name, type }) => {
-        return {
-          label: name,
-          value: name,
-          description: type,
-        };
-      })
-    );
-  }, [alertType?.value]);
-
-  return datasourceOptions;
 };
 
 const useFolderSelectOptions = (datasource: SelectableValue) => {
