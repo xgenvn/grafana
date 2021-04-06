@@ -24,6 +24,7 @@ export const rulesFiltersSlice = createSlice({
   reducers: {
     clearFilters: (state) => {
       state.rulesFilters = {};
+      return state;
     },
     setDataSource: (state, action: PayloadAction<string>) => {
       state.rulesFilters.dataSource = action.payload;
@@ -35,6 +36,7 @@ export const rulesFiltersSlice = createSlice({
     },
     setAlertState: (state, action: PayloadAction<string>) => {
       state.rulesFilters.alertState = action.payload;
+      return state;
     },
   },
 });
