@@ -1,29 +1,23 @@
 import React, { FC } from 'react';
 import _ from 'lodash';
 
-import { TemplateSrv } from '@grafana/runtime';
+import { getTemplateSrv, TemplateSrv } from '@grafana/runtime';
 import { SelectableValue, rangeUtil } from '@grafana/data';
-import { Segment } from '@grafana/ui';
+import { Select, InlineFields, Label } from '@grafana/ui';
 import { alignmentPeriods, alignOptions } from '../constants';
+import { BaseQuery } from '../types';
 
 export interface Props {
-  onChange: (alignmentPeriod: string) => void;
-  templateSrv: TemplateSrv;
+  onChange: (query: BaseQuery) => void;
+  query: BaseQuery;
   templateVariableOptions: Array<SelectableValue<string>>;
-  alignmentPeriod: string;
-  perSeriesAligner: string;
   usedAlignmentPeriod?: number;
 }
 
-export const AlignmentPeriods: FC<Props> = ({
-  alignmentPeriod,
-  templateSrv,
-  templateVariableOptions,
-  onChange,
-  perSeriesAligner,
-  usedAlignmentPeriod,
-}) => {
-  const alignment = alignOptions.find((ap) => ap.value === templateSrv.replace(perSeriesAligner));
+const templateSrv: TemplateSrv = getTemplateSrv();
+
+export const AlignmentPeriods: FC<Props> = ({ templateVariableOptions, onChange, query, usedAlignmentPeriod }) => {
+  const alignment = alignOptions.find((ap) => ap.value === templateSrv.replace(query.perSeriesAligner));
   const formatAlignmentText = usedAlignmentPeriod
     ? `${rangeUtil.secondsToHms(usedAlignmentPeriod)} interval (${alignment ? alignment.text : ''})`
     : '';
@@ -35,11 +29,10 @@ export const AlignmentPeriods: FC<Props> = ({
 
   return (
     <>
-      <div className="gf-form-inline">
-        <label className="gf-form-label query-keyword width-9">Alignment Period</label>
-        <Segment
-          onChange={({ value }) => onChange(value!)}
-          value={[...options, ...templateVariableOptions].find((s) => s.value === alignmentPeriod)}
+      <InlineFields label="Period">
+        <Select
+          onChange={({ value }) => onChange({ ...query, alignmentPeriod: value! })}
+          value={[...options, ...templateVariableOptions].find((s) => s.value === query.alignmentPeriod)}
           options={[
             {
               label: 'Template Variables',
@@ -52,11 +45,9 @@ export const AlignmentPeriods: FC<Props> = ({
             },
           ]}
           placeholder="Select Alignment"
-        ></Segment>
-        <div className="gf-form gf-form--grow">
-          {usedAlignmentPeriod && <label className="gf-form-label gf-form-label--grow">{formatAlignmentText}</label>}
-        </div>
-      </div>
+        ></Select>
+        <Label>{formatAlignmentText}</Label>
+      </InlineFields>
     </>
   );
 };

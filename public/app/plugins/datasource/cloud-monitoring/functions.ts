@@ -2,8 +2,10 @@ import _ from 'lodash';
 import { alignOptions, aggOptions, systemLabels } from './constants';
 import { SelectableValue } from '@grafana/data';
 import CloudMonitoringDatasource from './datasource';
-import { TemplateSrv } from '@grafana/runtime';
+import { TemplateSrv, getTemplateSrv } from '@grafana/runtime';
 import { MetricDescriptor, Filter, MetricQuery, ValueTypes, MetricKind } from './types';
+
+const templateSrv: TemplateSrv = getTemplateSrv();
 
 export const extractServicesFromMetricDescriptors = (metricDescriptors: MetricDescriptor[]) =>
   _.uniqBy(metricDescriptors, 'service');
@@ -61,10 +63,7 @@ export const getLabelKeys = async (
   return [...Object.keys(labels), ...systemLabels];
 };
 
-export const getAlignmentPickerData = (
-  { valueType, metricKind, perSeriesAligner }: Partial<MetricQuery>,
-  templateSrv: TemplateSrv
-) => {
+export const getAlignmentPickerData = ({ valueType, metricKind, perSeriesAligner }: Partial<MetricQuery>) => {
   const alignOptions = getAlignmentOptionsByMetric(valueType!, metricKind!).map((option) => ({
     ...option,
     label: option.text,

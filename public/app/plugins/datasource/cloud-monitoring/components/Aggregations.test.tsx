@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { shallow } from 'enzyme';
 import { Segment } from '@grafana/ui';
 import { Aggregations, Props } from './Aggregations';
-import { ValueTypes, MetricKind } from '../constants';
+import { ValueTypes, MetricKind } from '../types';
 import { TemplateSrvStub } from 'test/specs/helpers';
 
 const props: Props = {
@@ -16,9 +16,6 @@ const props: Props = {
   } as any,
   crossSeriesReducer: '',
   groupBys: [],
-  children(renderProps) {
-    return <div />;
-  },
   templateVariableOptions: [],
 };
 

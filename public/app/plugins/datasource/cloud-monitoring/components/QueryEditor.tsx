@@ -1,10 +1,12 @@
 import React, { PureComponent } from 'react';
 import appEvents from 'app/core/app_events';
+import { css } from '@emotion/css';
 import { CoreEvents } from 'app/types';
-import { ExploreQueryFieldProps, SelectableValue } from '@grafana/data';
-import { Segment } from '@grafana/ui';
-import { Help, MetricQueryEditor, SLOQueryEditor } from './';
+import { ExploreQueryFieldProps } from '@grafana/data';
+import { Button, InlineFields, RadioButtonGroup } from '@grafana/ui';
+import { Help, MetricQueryEditor, SLOQueryEditor, QueryEditorContainer } from './';
 import { CloudMonitoringQuery, MetricQuery, QueryType, SLOQuery, queryTypes, EditorMode } from '../types';
+import { LABEL_WIDTH } from '../constants';
 import { defaultQuery } from './MetricQueryEditor';
 import { defaultQuery as defaultSLOQuery } from './SLOQueryEditor';
 import { formatCloudMonitoringError, toOption } from '../functions';
@@ -46,7 +48,7 @@ export class QueryEditor extends PureComponent<Props, State> {
 
   componentWillUnmount() {
     appEvents.off(CoreEvents.dsRequestResponse, this.onDataResponse.bind(this));
-    appEvents.on(CoreEvents.dsRequestError, this.onDataError.bind(this));
+    appEvents.off(CoreEvents.dsRequestError, this.onDataError.bind(this));
   }
 
   onDataResponse() {
@@ -76,27 +78,23 @@ export class QueryEditor extends PureComponent<Props, State> {
     };
 
     return (
-      <>
-        <div className="gf-form-inline">
-          <label className="gf-form-label query-keyword width-9">Query Type</label>
-          <Segment
-            value={[...queryTypes, ...variableOptionGroup.options].find((qt) => qt.value === queryType)}
-            options={[
-              ...queryTypes,
-              {
-                label: 'Template Variables',
-                options: variableOptionGroup.options,
-              },
-            ]}
-            onChange={({ value }: SelectableValue<QueryType>) => {
+      <QueryEditorContainer>
+        <InlineFields label="Query Type" transparent labelWidth={LABEL_WIDTH}>
+          <RadioButtonGroup
+            value={queryType}
+            options={queryTypes}
+            onChange={(value) => {
               onChange({ ...query, sloQuery, queryType: value! });
               onRunQuery();
             }}
           />
 
           {query.queryType !== QueryType.SLO && (
-            <button
-              className="gf-form-label "
+            <Button
+              className={css`
+                margin-left: auto;
+              `}
+              icon="edit"
               onClick={() =>
                 this.onQueryChange('metricQuery', {
                   ...metricQuery,
@@ -104,15 +102,10 @@ export class QueryEditor extends PureComponent<Props, State> {
                 })
               }
             >
-              <span className="query-keyword">{'<>'}</span>&nbsp;&nbsp;
               {metricQuery.editorMode === EditorMode.MQL ? 'Switch to builder' : 'Edit MQL'}
-            </button>
+            </Button>
           )}
-
-          <div className="gf-form gf-form--grow">
-            <label className="gf-form-label gf-form-label--grow"></label>
-          </div>
-        </div>
+        </InlineFields>
 
         {queryType === QueryType.METRICS && (
           <MetricQueryEditor
@@ -120,6 +113,7 @@ export class QueryEditor extends PureComponent<Props, State> {
             variableOptionGroup={variableOptionGroup}
             usedAlignmentPeriod={usedAlignmentPeriod}
             onChange={(metricQuery: MetricQuery) => {
+              console.log('MetricQueryEditor change');
               this.props.onChange({ ...this.props.query, metricQuery });
             }}
             onRunQuery={onRunQuery}
@@ -143,7 +137,7 @@ export class QueryEditor extends PureComponent<Props, State> {
           rawQuery={decodeURIComponent(meta?.executedQueryString ?? '')}
           lastQueryError={this.state.lastQueryError}
         />
-      </>
+      </QueryEditorContainer>
     );
   }
 }

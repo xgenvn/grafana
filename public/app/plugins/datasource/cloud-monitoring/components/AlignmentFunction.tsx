@@ -1,21 +1,24 @@
-import React, { FC } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { SelectableValue } from '@grafana/data';
-import { InlineField, Segment } from '@grafana/ui';
+import { InlineField, Select } from '@grafana/ui';
+import { MetricQuery } from '../types';
+import { getAlignmentPickerData } from '../functions';
 
 export interface Props {
-  onChange: (perSeriesAligner: string) => void;
+  onChange: (query: MetricQuery) => void;
+  query: MetricQuery;
   templateVariableOptions: Array<SelectableValue<string>>;
-  alignOptions: Array<SelectableValue<string>>;
-  perSeriesAligner: string;
 }
 
-export const Alignments: FC<Props> = ({ perSeriesAligner, templateVariableOptions, onChange, alignOptions }) => {
+export const AlignmentFunction: FC<Props> = ({ query, templateVariableOptions, onChange }) => {
+  const { perSeriesAligner, alignOptions } = useMemo(() => getAlignmentPickerData(query), [query]);
+
   return (
     <>
-      <InlineField label="Alignment">
-        <Segment
-          onChange={({ value }) => onChange(value!)}
+      <InlineField label="Alignment function">
+        <Select
+          onChange={({ value }) => onChange({ ...query, perSeriesAligner: value! })}
           value={[...alignOptions, ...templateVariableOptions].find((s) => s.value === perSeriesAligner)}
           options={[
             {
@@ -29,7 +32,7 @@ export const Alignments: FC<Props> = ({ perSeriesAligner, templateVariableOption
             },
           ]}
           placeholder="Select Alignment"
-        ></Segment>
+        ></Select>
       </InlineField>
     </>
   );

@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Project, VisualMetricQueryEditor, AliasBy } from '.';
-import { MetricQuery, MetricDescriptor, EditorMode, Preprocessing, MetricKind } from '../types';
+import { MetricQuery, MetricDescriptor, EditorMode, MetricKind, PreprocessorType } from '../types';
 import { getAlignmentPickerData } from '../functions';
 import CloudMonitoringDatasource from '../datasource';
 import { SelectableValue } from '@grafana/data';
 import { MQLQueryEditor } from './MQLQueryEditor';
+import { InlineFields } from '@grafana/ui';
+import { LABEL_WIDTH } from '../constants';
 
 export interface Props {
   refId: string;
@@ -39,7 +41,7 @@ export const defaultQuery: (dataSource: CloudMonitoringDatasource) => MetricQuer
   filters: [],
   aliasBy: '',
   query: '',
-  preprocessing: Preprocessing.None,
+  preprocessing: PreprocessorType.None,
 });
 
 function Editor({
@@ -68,27 +70,38 @@ function Editor({
   };
 
   const onMetricTypeChange = async ({ valueType, metricKind, type, unit }: MetricDescriptor) => {
-    const { perSeriesAligner, alignOptions } = getAlignmentPickerData(
-      { valueType, metricKind, perSeriesAligner: state.perSeriesAligner },
-      datasource.templateSrv
-    );
+    const { perSeriesAligner, alignOptions } = getAlignmentPickerData({
+      valueType,
+      metricKind,
+      perSeriesAligner: state.perSeriesAligner,
+    });
     setState({
       ...state,
       alignOptions,
     });
-    onChange({ ...query, perSeriesAligner, metricType: type, unit, valueType, metricKind });
+    onChange({
+      ...query,
+      perSeriesAligner,
+      metricType: type,
+      unit,
+      valueType,
+      metricKind,
+      preprocessor: metricKind !== query?.metricKind ? PreprocessorType.None : query.preprocessor,
+    });
   };
 
   return (
     <>
-      <Project
-        templateVariableOptions={variableOptionGroup.options}
-        projectName={projectName}
-        datasource={datasource}
-        onChange={(projectName) => {
-          onChange({ ...query, projectName });
-        }}
-      />
+      <InlineFields label="Project" transparent labelWidth={LABEL_WIDTH}>
+        <Project
+          templateVariableOptions={variableOptionGroup.options}
+          projectName={projectName}
+          datasource={datasource}
+          onChange={(projectName) => {
+            onChange({ ...query, projectName });
+          }}
+        />
+      </InlineFields>
 
       {editorMode === EditorMode.Visual && (
         <VisualMetricQueryEditor

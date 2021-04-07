@@ -1,6 +1,7 @@
 import React, { InputHTMLAttributes, FunctionComponent } from 'react';
 import { InlineFormLabel, Select, InlineField } from '@grafana/ui';
 import { SelectableValue } from '@grafana/data';
+import { css } from '@emotion/css';
 
 export interface Props extends InputHTMLAttributes<HTMLInputElement> {
   label: string;
@@ -55,3 +56,15 @@ export const VariableQueryField: FunctionComponent<VariableQueryFieldProps> = ({
     </InlineField>
   );
 };
+
+export const QueryEditorContainer: FunctionComponent = ({ children }) => (
+  <div
+    className={css`
+      > * {
+        margin: 8px 0;
+      }
+    `}
+  >
+    {children}
+  </div>
+);

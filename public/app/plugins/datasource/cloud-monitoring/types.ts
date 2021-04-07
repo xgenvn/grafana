@@ -63,7 +63,7 @@ export enum EditorMode {
   MQL = 'mql',
 }
 
-export enum Preprocessing {
+export enum PreprocessorType {
   None = 'none',
   Rate = 'rate',
   Delta = 'delta',
@@ -87,13 +87,13 @@ export enum ValueTypes {
 }
 
 export const preprocessors = [
-  { label: 'None', value: Preprocessing.None },
+  { label: 'None', value: PreprocessorType.None },
   {
     label: 'Rate',
-    value: Preprocessing.Rate,
+    value: PreprocessorType.Rate,
     description: 'Data points are aligned and converted to a rate per time series',
   },
-  { label: 'Delta', value: Preprocessing.Delta },
+  { label: 'Delta', value: PreprocessorType.Delta },
 ];
 
 export const queryTypes = [
@@ -101,29 +101,28 @@ export const queryTypes = [
   { label: 'Service Level Objectives (SLO)', value: QueryType.SLO },
 ];
 
-export interface MetricQuery {
-  editorMode: EditorMode;
+export interface BaseQuery {
   projectName: string;
+  perSeriesAligner?: string;
+  alignmentPeriod?: string;
+  aliasBy?: string;
+}
+
+export interface MetricQuery extends BaseQuery {
+  editorMode: EditorMode;
   unit?: string;
   metricType: string;
   crossSeriesReducer: string;
-  alignmentPeriod?: string;
-  perSeriesAligner?: string;
   groupBys?: string[];
   filters?: string[];
-  aliasBy?: string;
   metricKind?: MetricKind;
   valueType?: string;
   view?: string;
   query: string;
-  preprocessing?: Preprocessing;
+  preprocessor?: PreprocessorType;
 }
 
-export interface SLOQuery {
-  projectName: string;
-  alignmentPeriod?: string;
-  perSeriesAligner?: string;
-  aliasBy?: string;
+export interface SLOQuery extends BaseQuery {
   selectorName: string;
   serviceId: string;
   serviceName: string;

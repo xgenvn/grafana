@@ -1,9 +1,10 @@
 import React, { FunctionComponent, Fragment } from 'react';
-import _ from 'lodash';
 import { SelectableValue } from '@grafana/data';
-import { Segment, Icon } from '@grafana/ui';
+import { Button, InlineFields, Select } from '@grafana/ui';
 import { labelsToGroupedOptions, filtersToStringArray, stringArrayToFilters, toOption } from '../functions';
 import { Filter } from '../types';
+import { CustomControlProps } from '@grafana/ui/src/components/Select/types';
+import { LABEL_WIDTH } from '../constants';
 
 export interface Props {
   labels: { [key: string]: string[] };
@@ -16,6 +17,18 @@ const removeText = '-- remove filter --';
 const removeOption: SelectableValue<string> = { label: removeText, value: removeText, icon: 'times' };
 const operators = ['=', '!=', '=~', '!=~'];
 
+const FilterButton = React.forwardRef<HTMLButtonElement, CustomControlProps<string>>(
+  ({ value, isOpen, invalid, ...rest }, ref) => {
+    return (
+      <Button ref={ref} {...rest} variant="secondary" icon="plus">
+        Add filter
+      </Button>
+    );
+  }
+);
+
+FilterButton.displayName = 'BilterButton';
+
 export const LabelFilter: FunctionComponent<Props> = ({
   labels = {},
   filters: filterArray,
@@ -27,11 +40,17 @@ export const LabelFilter: FunctionComponent<Props> = ({
   const options = [removeOption, variableOptionGroup, ...labelsToGroupedOptions(Object.keys(labels))];
 
   return (
-    <div className="gf-form-inline">
-      <label className="gf-form-label query-keyword width-9">Filter</label>
+    <InlineFields
+      label="Filter"
+      transparent
+      labelWidth={LABEL_WIDTH}
+      tooltip={
+        'To reduce the amount of data charted, apply a filter. A filter has three components: a label, a comparison, and a value. The comparison can be an equality, inequality, or regular expression.'
+      }
+    >
       {filters.map(({ key, operator, value, condition }, index) => (
         <Fragment key={index}>
-          <Segment
+          <Select
             allowCustomValue
             value={key}
             options={options}
@@ -47,15 +66,17 @@ export const LabelFilter: FunctionComponent<Props> = ({
               }
             }}
           />
-          <Segment
+          <Select
             value={operator}
-            className="gf-form-label query-segment-operator"
+            // className="gf-form-label query-segment-operator"
             options={operators.map(toOption)}
             onChange={({ value: operator = '=' }) =>
               onChange(filtersToStringArray(filters.map((f, i) => (i === index ? { ...f, operator } : f))))
             }
+            menuPlacement="bottom"
+            renderControl={FilterButton}
           />
-          <Segment
+          <Select
             allowCustomValue
             value={value}
             placeholder="add filter value"
@@ -72,22 +93,21 @@ export const LabelFilter: FunctionComponent<Props> = ({
         </Fragment>
       ))}
       {Object.values(filters).every(({ value }) => value) && (
-        <Segment
+        <Select
           allowCustomValue
-          Component={
-            <a className="gf-form-label query-part">
-              <Icon name="plus" />
-            </a>
-          }
+          // Component={
+          //   <a className="gf-form-label query-part">
+          //     <Icon name="plus" />
+          //   </a>
+          // }
           options={[variableOptionGroup, ...labelsToGroupedOptions(Object.keys(labels))]}
           onChange={({ value: key = '' }) =>
             onChange(filtersToStringArray([...filters, { key, operator: '=', condition: 'AND', value: '' } as Filter]))
           }
+          menuPlacement="bottom"
+          renderControl={FilterButton}
         />
       )}
-      <div className="gf-form gf-form--grow">
-        <label className="gf-form-label gf-form-label--grow"></label>
-      </div>
-    </div>
+    </InlineFields>
   );
 };

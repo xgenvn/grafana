@@ -18,6 +18,7 @@ export interface Props {
 export const defaultQuery: (dataSource: CloudMonitoringDatasource) => SLOQuery = (dataSource) => ({
   projectName: dataSource.getDefaultProject(),
   alignmentPeriod: 'cloud-monitoring-auto',
+  perSeriesAligner: 'ALIGN_MEAN',
   aliasBy: '',
   selectorName: 'select_slo_health',
   serviceId: '',
@@ -99,12 +100,13 @@ export function SLOQueryEditor({
       </QueryInlineField>
 
       <AlignmentPeriods
-        templateSrv={datasource.templateSrv}
         templateVariableOptions={variableOptionGroup.options}
-        alignmentPeriod={query.alignmentPeriod || ''}
-        perSeriesAligner={query.selectorName === 'select_slo_health' ? 'ALIGN_MEAN' : 'ALIGN_NEXT_OLDER'}
+        query={query}
+        // alignmentPeriod={query.alignmentPeriod || ''}
+        // perSeriesAligner={query.selectorName === 'select_slo_health' ? 'ALIGN_MEAN' : 'ALIGN_NEXT_OLDER'}
         usedAlignmentPeriod={usedAlignmentPeriod}
-        onChange={(alignmentPeriod) => onChange({ ...query, alignmentPeriod })}
+        onChange={onChange}
+        // onChange={(alignmentPeriod) => onChange({ ...query, alignmentPeriod })}
       />
       <AliasBy value={query.aliasBy} onChange={(aliasBy) => onChange({ ...query, aliasBy })} />
     </>

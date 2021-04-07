@@ -1,5 +1,7 @@
 import { MetricKind, ValueTypes } from './types';
 
+export const LABEL_WIDTH = 18;
+
 export const alignOptions = [
   {
     text: 'delta',
