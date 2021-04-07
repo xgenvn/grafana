@@ -155,6 +155,7 @@ export { Legend } from './Forms/Legend';
 export { FieldSet } from './Forms/FieldSet';
 export { FieldValidationMessage } from './Forms/FieldValidationMessage';
 export { InlineField } from './Forms/InlineField';
+export { InlineFields } from './Forms/InlineFields';
 export { InlineSegmentGroup } from './Forms/InlineSegmentGroup';
 export { InlineLabel } from './Forms/InlineLabel';
 export { InlineFieldRow } from './Forms/InlineFieldRow';
