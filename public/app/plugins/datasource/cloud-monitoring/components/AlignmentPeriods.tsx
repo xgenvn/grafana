@@ -29,7 +29,7 @@ export const AlignmentPeriods: FC<Props> = ({ templateVariableOptions, onChange,
 
   return (
     <>
-      <InlineFields label="Period">
+      <InlineFields label="Period" className="width-16">
         <Select
           onChange={({ value }) => onChange({ ...query, alignmentPeriod: value! })}
           value={[...options, ...templateVariableOptions].find((s) => s.value === query.alignmentPeriod)}

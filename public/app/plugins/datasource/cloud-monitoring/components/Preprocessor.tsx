@@ -18,7 +18,6 @@ export const Preprocessor: FunctionComponent<Props> = ({
   onChange,
 }) => {
   const options = useOptions(metricDescriptor);
-  console.log({ kind: metricDescriptor?.metricKind, options });
   return (
     <InlineFields label="Pre-processing" transparent labelWidth={LABEL_WIDTH}>
       <RadioButtonGroup
@@ -47,16 +46,14 @@ const useOptions = (metricDescriptor?: MetricDescriptor): Array<SelectableValue<
       },
     ];
 
-    const a =
-      metricKind === MetricKind.CUMULATIVE
-        ? [
-            ...options,
-            {
-              label: 'Delta',
-              value: PreprocessorType.Delta,
-            },
-          ]
-        : options;
-    return a;
+    return metricKind === MetricKind.CUMULATIVE
+      ? [
+          ...options,
+          {
+            label: 'Delta',
+            value: PreprocessorType.Delta,
+          },
+        ]
+      : options;
   }, [metricKind]);
 };

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { SelectableValue } from '@grafana/data';
-import { Select } from '@grafana/ui';
+import { InlineFields, Select } from '@grafana/ui';
 import CloudMonitoringDatasource from '../datasource';
+import { LABEL_WIDTH, SELECT_WIDTH } from '../constants';
 
 export interface Props {
   datasource: CloudMonitoringDatasource;
@@ -25,13 +26,15 @@ export function Project({ projectName, datasource, onChange, templateVariableOpt
   }, [datasource, templateVariableOptions]);
 
   return (
-    <Select
-      width={24}
-      allowCustomValue
-      onChange={({ value }) => onChange(value!)}
-      options={projects}
-      value={{ value: projectName, label: projectName }}
-      placeholder="Select Project"
-    />
+    <InlineFields label="Project" transparent labelWidth={LABEL_WIDTH}>
+      <Select
+        width={SELECT_WIDTH}
+        allowCustomValue
+        onChange={({ value }) => onChange(value!)}
+        options={projects}
+        value={{ value: projectName, label: projectName }}
+        placeholder="Select Project"
+      />
+    </InlineFields>
   );
 }

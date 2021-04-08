@@ -5,8 +5,6 @@ import { getAlignmentPickerData } from '../functions';
 import CloudMonitoringDatasource from '../datasource';
 import { SelectableValue } from '@grafana/data';
 import { MQLQueryEditor } from './MQLQueryEditor';
-import { InlineFields } from '@grafana/ui';
-import { LABEL_WIDTH } from '../constants';
 
 export interface Props {
   refId: string;
@@ -92,16 +90,14 @@ function Editor({
 
   return (
     <>
-      <InlineFields label="Project" transparent labelWidth={LABEL_WIDTH}>
-        <Project
-          templateVariableOptions={variableOptionGroup.options}
-          projectName={projectName}
-          datasource={datasource}
-          onChange={(projectName) => {
-            onChange({ ...query, projectName });
-          }}
-        />
-      </InlineFields>
+      <Project
+        templateVariableOptions={variableOptionGroup.options}
+        projectName={projectName}
+        datasource={datasource}
+        onChange={(projectName) => {
+          onChange({ ...query, projectName });
+        }}
+      />
 
       {editorMode === EditorMode.Visual && (
         <VisualMetricQueryEditor

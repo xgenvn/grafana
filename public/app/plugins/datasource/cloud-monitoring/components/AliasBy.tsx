@@ -21,7 +21,7 @@ export const AliasBy: FunctionComponent<Props> = ({ value = '', onChange }) => {
 
   return (
     <InlineFields label="Alias By" grow transparent labelWidth={LABEL_WIDTH}>
-      <Input type="text" value={alias} onChange={onChange} />
+      <Input width={70} type="text" value={alias} onChange={onChange} />
     </InlineFields>
   );
 };

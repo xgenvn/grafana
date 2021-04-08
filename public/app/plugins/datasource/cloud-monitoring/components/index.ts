@@ -10,7 +10,7 @@ export { AlignmentPeriods } from './AlignmentPeriods';
 export { AliasBy } from './AliasBy';
 export { Aggregations } from './Aggregations';
 export { MetricQueryEditor } from './MetricQueryEditor';
-export { SLOQueryEditor } from './SLOQueryEditor';
+export { SLOQueryEditor } from './SLO/SLOQueryEditor';
 export { MQLQueryEditor } from './MQLQueryEditor';
 export { QueryTypeSelector } from './QueryType';
 export { QueryInlineField, QueryField, VariableQueryField, QueryEditorContainer } from './Fields';

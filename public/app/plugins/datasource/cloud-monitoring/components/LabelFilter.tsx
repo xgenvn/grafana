@@ -1,10 +1,11 @@
-import React, { FunctionComponent, Fragment } from 'react';
+import React, { FunctionComponent, useCallback, useMemo } from 'react';
+import flatten from 'lodash/flatten';
 import { SelectableValue } from '@grafana/data';
-import { Button, InlineFields, Select } from '@grafana/ui';
-import { labelsToGroupedOptions, filtersToStringArray, stringArrayToFilters, toOption } from '../functions';
+import { Button, HorizontalGroup, InlineFields, Select, VerticalGroup } from '@grafana/ui';
+import { labelsToGroupedOptions, stringArrayToFilters, toOption } from '../functions';
 import { Filter } from '../types';
 import { CustomControlProps } from '@grafana/ui/src/components/Select/types';
-import { LABEL_WIDTH } from '../constants';
+import { LABEL_WIDTH, SELECT_WIDTH } from '../constants';
 
 export interface Props {
   labels: { [key: string]: string[] };
@@ -13,10 +14,7 @@ export interface Props {
   variableOptionGroup: SelectableValue<string>;
 }
 
-const removeText = '-- remove filter --';
-const removeOption: SelectableValue<string> = { label: removeText, value: removeText, icon: 'times' };
 const operators = ['=', '!=', '=~', '!=~'];
-
 const FilterButton = React.forwardRef<HTMLButtonElement, CustomControlProps<string>>(
   ({ value, isOpen, invalid, ...rest }, ref) => {
     return (
@@ -27,7 +25,19 @@ const FilterButton = React.forwardRef<HTMLButtonElement, CustomControlProps<stri
   }
 );
 
-FilterButton.displayName = 'BilterButton';
+FilterButton.displayName = 'FilterButton';
+
+const OperatorButton = React.forwardRef<HTMLButtonElement, CustomControlProps<string>>(
+  ({ value, isOpen, invalid, ...rest }, ref) => {
+    return (
+      <Button ref={ref} {...rest} variant="secondary">
+        <span className="query-segment-operator">{value?.label}</span>
+      </Button>
+    );
+  }
+);
+
+OperatorButton.displayName = 'OperatorButton';
 
 export const LabelFilter: FunctionComponent<Props> = ({
   labels = {},
@@ -35,9 +45,16 @@ export const LabelFilter: FunctionComponent<Props> = ({
   onChange,
   variableOptionGroup,
 }) => {
-  const filters = stringArrayToFilters(filterArray);
+  const filters = useMemo(() => stringArrayToFilters(filterArray), [filterArray]);
+  const options = useMemo(() => [variableOptionGroup, ...labelsToGroupedOptions(Object.keys(labels))], [
+    labels,
+    variableOptionGroup,
+  ]);
 
-  const options = [removeOption, variableOptionGroup, ...labelsToGroupedOptions(Object.keys(labels))];
+  const filtersToStringArray = useCallback((filters: Filter[]) => {
+    const strArr = flatten(filters.map(({ key, operator, value, condition }) => [key, operator, value, condition!]));
+    return strArr.filter((_, i) => i !== strArr.length - 1);
+  }, []);
 
   return (
     <InlineFields
@@ -48,66 +65,66 @@ export const LabelFilter: FunctionComponent<Props> = ({
         'To reduce the amount of data charted, apply a filter. A filter has three components: a label, a comparison, and a value. The comparison can be an equality, inequality, or regular expression.'
       }
     >
-      {filters.map(({ key, operator, value, condition }, index) => (
-        <Fragment key={index}>
-          <Select
-            allowCustomValue
-            value={key}
-            options={options}
-            onChange={({ value: key = '' }) => {
-              if (key === removeText) {
-                onChange(filtersToStringArray(filters.filter((_, i) => i !== index)));
-              } else {
+      <VerticalGroup spacing="xs">
+        {filters.map(({ key, operator, value, condition }, index) => (
+          <HorizontalGroup key={index} spacing="xs">
+            <Select
+              width={SELECT_WIDTH}
+              allowCustomValue
+              value={key}
+              options={options}
+              onChange={({ value: key = '' }) => {
                 onChange(
                   filtersToStringArray(
                     filters.map((f, i) => (i === index ? { key, operator, condition, value: '' } : f))
                   )
                 );
+              }}
+            />
+            <Select
+              value={operator}
+              options={operators.map(toOption)}
+              onChange={({ value: operator = '=' }) =>
+                onChange(filtersToStringArray(filters.map((f, i) => (i === index ? { ...f, operator } : f))))
               }
-            }}
-          />
+              menuPlacement="bottom"
+              renderControl={OperatorButton}
+            />
+            <Select
+              width={SELECT_WIDTH}
+              allowCustomValue
+              value={value}
+              placeholder="add filter value"
+              options={
+                labels.hasOwnProperty(key) ? [variableOptionGroup, ...labels[key].map(toOption)] : [variableOptionGroup]
+              }
+              onChange={({ value = '' }) =>
+                onChange(filtersToStringArray(filters.map((f, i) => (i === index ? { ...f, value } : f))))
+              }
+            />
+            <Button
+              variant="secondary"
+              size="md"
+              icon="trash-alt"
+              aria-label="Remove"
+              onClick={() => onChange(filtersToStringArray(filters.filter((_, i) => i !== index)))}
+            ></Button>
+          </HorizontalGroup>
+        ))}
+        {Object.values(filters).every(({ value }) => value) && (
           <Select
-            value={operator}
-            // className="gf-form-label query-segment-operator"
-            options={operators.map(toOption)}
-            onChange={({ value: operator = '=' }) =>
-              onChange(filtersToStringArray(filters.map((f, i) => (i === index ? { ...f, operator } : f))))
+            allowCustomValue
+            options={[variableOptionGroup, ...labelsToGroupedOptions(Object.keys(labels))]}
+            onChange={({ value: key = '' }) =>
+              onChange(
+                filtersToStringArray([...filters, { key, operator: '=', condition: 'AND', value: '' } as Filter])
+              )
             }
             menuPlacement="bottom"
             renderControl={FilterButton}
           />
-          <Select
-            allowCustomValue
-            value={value}
-            placeholder="add filter value"
-            options={
-              labels.hasOwnProperty(key) ? [variableOptionGroup, ...labels[key].map(toOption)] : [variableOptionGroup]
-            }
-            onChange={({ value = '' }) =>
-              onChange(filtersToStringArray(filters.map((f, i) => (i === index ? { ...f, value } : f))))
-            }
-          />
-          {filters.length > 1 && index + 1 !== filters.length && (
-            <label className="gf-form-label query-keyword">{condition}</label>
-          )}
-        </Fragment>
-      ))}
-      {Object.values(filters).every(({ value }) => value) && (
-        <Select
-          allowCustomValue
-          // Component={
-          //   <a className="gf-form-label query-part">
-          //     <Icon name="plus" />
-          //   </a>
-          // }
-          options={[variableOptionGroup, ...labelsToGroupedOptions(Object.keys(labels))]}
-          onChange={({ value: key = '' }) =>
-            onChange(filtersToStringArray([...filters, { key, operator: '=', condition: 'AND', value: '' } as Filter]))
-          }
-          menuPlacement="bottom"
-          renderControl={FilterButton}
-        />
-      )}
+        )}
+      </VerticalGroup>
     </InlineFields>
   );
 };

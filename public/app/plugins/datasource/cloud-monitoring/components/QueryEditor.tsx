@@ -8,7 +8,7 @@ import { Help, MetricQueryEditor, SLOQueryEditor, QueryEditorContainer } from '.
 import { CloudMonitoringQuery, MetricQuery, QueryType, SLOQuery, queryTypes, EditorMode } from '../types';
 import { LABEL_WIDTH } from '../constants';
 import { defaultQuery } from './MetricQueryEditor';
-import { defaultQuery as defaultSLOQuery } from './SLOQueryEditor';
+import { defaultQuery as defaultSLOQuery } from './SLO/SLOQueryEditor';
 import { formatCloudMonitoringError, toOption } from '../functions';
 import CloudMonitoringDatasource from '../datasource';
 

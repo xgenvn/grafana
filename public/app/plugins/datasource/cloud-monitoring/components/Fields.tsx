@@ -61,7 +61,7 @@ export const QueryEditorContainer: FunctionComponent = ({ children }) => (
   <div
     className={css`
       > * {
-        margin: 8px 0;
+        margin: 4px 0;
       }
     `}
   >

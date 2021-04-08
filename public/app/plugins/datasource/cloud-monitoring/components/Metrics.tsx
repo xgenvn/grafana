@@ -119,8 +119,8 @@ export function Metrics(props: Props) {
 
   return (
     <>
-      <InlineFields label="Metric" transparent labelWidth={LABEL_WIDTH}>
-        <InlineField label="Service">
+      <InlineFields transparent label="Metric" labelWidth={LABEL_WIDTH}>
+        <InlineField className="width-16" label="Service">
           <Select
             onChange={onServiceChange}
             value={[...services, ...templateVariableOptions].find((s) => s.value === service)}
@@ -134,7 +134,7 @@ export function Metrics(props: Props) {
             placeholder="Select Services"
           ></Select>
         </InlineField>
-        <InlineField label="Metric">
+        <InlineField className="width-20" label="Metric">
           <Select
             onChange={onMetricTypeChange}
             value={[...metrics, ...templateVariableOptions].find((s) => s.value === metricType)}

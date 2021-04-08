@@ -3,7 +3,7 @@ import { alignOptions, aggOptions, systemLabels } from './constants';
 import { SelectableValue } from '@grafana/data';
 import CloudMonitoringDatasource from './datasource';
 import { TemplateSrv, getTemplateSrv } from '@grafana/runtime';
-import { MetricDescriptor, Filter, MetricQuery, ValueTypes, MetricKind } from './types';
+import { MetricDescriptor, MetricQuery, ValueTypes, MetricKind } from './types';
 
 const templateSrv: TemplateSrv = getTemplateSrv();
 
@@ -90,11 +90,6 @@ export const labelsToGroupedOptions = (groupBys: string[]) => {
     return acc;
   }, {});
   return Object.entries(groups).map(([label, options]) => ({ label, options, expanded: true }), []);
-};
-
-export const filtersToStringArray = (filters: Filter[]) => {
-  const strArr = _.flatten(filters.map(({ key, operator, value, condition }) => [key, operator, value, condition!]));
-  return strArr.filter((_, i) => i !== strArr.length - 1);
 };
 
 export const stringArrayToFilters = (filterArray: string[]) =>
