@@ -23,7 +23,10 @@ export const rulesFiltersSlice = createSlice({
   initialState: rulesFiltersInitialState,
   reducers: {
     clearFilters: (state) => {
-      state.rulesFilters = {};
+      state.rulesFilters = {
+        queryString: '',
+        dataSource: '',
+      };
       return state;
     },
     setDataSource: (state, action: PayloadAction<string>) => {
