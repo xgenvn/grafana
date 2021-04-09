@@ -71,13 +71,8 @@ function Editor({
   );
 
   const onMetricTypeChange = useCallback(
-    () => ({ valueType, metricKind, type, unit }: MetricDescriptor) => {
-      const { perSeriesAligner, alignOptions } = getAlignmentPickerData(valueType, metricKind, state.perSeriesAligner);
-
-      setState({
-        ...state,
-        alignOptions,
-      });
+    ({ valueType, metricKind, type, unit }: MetricDescriptor) => {
+      const { perSeriesAligner } = getAlignmentPickerData(valueType, metricKind, state.perSeriesAligner);
       onChange({
         ...query,
         perSeriesAligner,
@@ -85,7 +80,7 @@ function Editor({
         unit,
         valueType,
         metricKind,
-        preprocessor: metricKind !== query?.metricKind ? PreprocessorType.None : query.preprocessor,
+        preprocessor: PreprocessorType.None,
       });
     },
     [onChange, query, state]

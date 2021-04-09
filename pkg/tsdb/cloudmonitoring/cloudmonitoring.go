@@ -346,7 +346,7 @@ func setMetricAggParams(params *url.Values, query *metricQuery, durationSeconds 
 
 	alignmentPeriod := calculateAlignmentPeriod(query.AlignmentPeriod, intervalMs, durationSeconds)
 
-	// In case a preprocessor is defined, the preprocessor becomes the primary aggregation
+	// In case a preprocessor is defined, the preprocessor becomes the primary aggregation 
 	// and the aggregation that is specified in the UI becomes the secondary aggregation
 	if query.PreprocessorType != PreprocessorTypeNone {
 		params.Add("secondaryAggregation.alignmentPeriod", alignmentPeriod)
