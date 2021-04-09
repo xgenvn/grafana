@@ -895,102 +895,29 @@ func TestCloudMonitoring(t *testing.T) {
 		})
 	})
 
-	t.Run("Parse cloud monitoring unit", func(t *testing.T) {
-		t.Run("when there is only one query", func(t *testing.T) {
-			t.Run("and cloud monitoring unit does not have a corresponding grafana unit", func(t *testing.T) {
-				executors := []cloudMonitoringQueryExecutor{
-					&cloudMonitoringTimeSeriesFilter{Params: url.Values{}, ProjectName: "test-proj", Selector: "select_slo_compliance", Service: "test-service",
-						Slo: "test-slo", Unit: "megaseconds"},
-				}
-				unit := executor.resolvePanelUnitFromQueries(executors)
-				assert.Equal(t, "", unit)
-			})
+	t.Run("when data from query returns MQL and alias by is defined", func(t *testing.T) {
+		data, err := loadTestFile("./test-data/7-series-response-mql.json")
+		require.NoError(t, err)
+		assert.Equal(t, 0, len(data.TimeSeries))
+		assert.Equal(t, 1, len(data.TimeSeriesData))
 
-			t.Run("and cloud monitoring unit has a corresponding grafana unit", func(t *testing.T) {
-				for key, element := range cloudMonitoringUnitMappings {
-					queries := []cloudMonitoringQueryExecutor{
-						&cloudMonitoringTimeSeriesFilter{Params: url.Values{}, ProjectName: "test-proj", Selector: "select_slo_compliance", Service: "test-service",
-							Slo: "test-slo", Unit: key},
-					}
-					unit := executor.resolvePanelUnitFromQueries(queries)
-					assert.Equal(t, element, unit)
-				}
-			})
-		})
-
-		t.Run("when there are more than one query", func(t *testing.T) {
-			t.Run("and all target units are the same", func(t *testing.T) {
-				for key, element := range cloudMonitoringUnitMappings {
-					queries := []cloudMonitoringQueryExecutor{
-						&cloudMonitoringTimeSeriesFilter{
-							Params: url.Values{}, ProjectName: "test-proj", Selector: "select_slo_compliance",
-							Service: "test-service1", Slo: "test-slo", Unit: key,
-						},
-						&cloudMonitoringTimeSeriesFilter{
-							Params: url.Values{}, ProjectName: "test-proj", Selector: "select_slo_compliance",
-							Service: "test-service2", Slo: "test-slo", Unit: key,
-						},
-					}
-					unit := executor.resolvePanelUnitFromQueries(queries)
-					assert.Equal(t, element, unit)
-				}
-			})
-
-			t.Run("and all target units are the same but does not have grafana mappings", func(t *testing.T) {
-				queries := []cloudMonitoringQueryExecutor{
-					&cloudMonitoringTimeSeriesFilter{
-						Params: url.Values{}, ProjectName: "test-proj", Selector: "select_slo_compliance",
-						Service: "test-service1", Slo: "test-slo", Unit: "megaseconds",
-					},
-					&cloudMonitoringTimeSeriesFilter{
-						Params: url.Values{}, ProjectName: "test-proj", Selector: "select_slo_compliance",
-						Service: "test-service2", Slo: "test-slo", Unit: "megaseconds",
-					},
-				}
-				unit := executor.resolvePanelUnitFromQueries(queries)
-				assert.Equal(t, "", unit)
-			})
-
-			t.Run("and all target units are not the same", func(t *testing.T) {
-				queries := []cloudMonitoringQueryExecutor{
-					&cloudMonitoringTimeSeriesFilter{
-						Params: url.Values{}, ProjectName: "test-proj", Selector: "select_slo_compliance",
-						Service: "test-service1", Slo: "test-slo", Unit: "bit",
-					},
-					&cloudMonitoringTimeSeriesFilter{
-						Params: url.Values{}, ProjectName: "test-proj", Selector: "select_slo_compliance",
-						Service: "test-service2", Slo: "test-slo", Unit: "min",
-					},
-				}
-				unit := executor.resolvePanelUnitFromQueries(queries)
-				assert.Equal(t, "", unit)
-			})
-		})
-
-		t.Run("when data from query returns MQL and alias by is defined", func(t *testing.T) {
-			data, err := loadTestFile("./test-data/7-series-response-mql.json")
+		t.Run("and alias by is expanded", func(t *testing.T) {
+			fromStart := time.Date(2018, 3, 15, 13, 0, 0, 0, time.UTC).In(time.Local)
+			res := &plugins.DataQueryResult{Meta: simplejson.New(), RefID: "A"}
+			query := &cloudMonitoringTimeSeriesQuery{
+				ProjectName: "test-proj",
+				Query:       "test-query",
+				AliasBy:     "{{project}} - {{resource.label.zone}} - {{resource.label.instance_id}}",
+				timeRange: plugins.DataTimeRange{
+					From: fmt.Sprintf("%v", fromStart.Unix()*1000),
+					To:   fmt.Sprintf("%v", fromStart.Add(34*time.Minute).Unix()*1000),
+				},
+			}
+			err = query.parseResponse(res, data, "")
 			require.NoError(t, err)
-			assert.Equal(t, 0, len(data.TimeSeries))
-			assert.Equal(t, 1, len(data.TimeSeriesData))
-
-			t.Run("and alias by is expanded", func(t *testing.T) {
-				fromStart := time.Date(2018, 3, 15, 13, 0, 0, 0, time.UTC).In(time.Local)
-				res := &plugins.DataQueryResult{Meta: simplejson.New(), RefID: "A"}
-				query := &cloudMonitoringTimeSeriesQuery{
-					ProjectName: "test-proj",
-					Query:       "test-query",
-					AliasBy:     "{{project}} - {{resource.label.zone}} - {{resource.label.instance_id}}",
-					timeRange: plugins.DataTimeRange{
-						From: fmt.Sprintf("%v", fromStart.Unix()*1000),
-						To:   fmt.Sprintf("%v", fromStart.Add(34*time.Minute).Unix()*1000),
-					},
-				}
-				err = query.parseResponse(res, data, "")
-				require.NoError(t, err)
-				frames, err := res.Dataframes.Decoded()
-				require.NoError(t, err)
-				assert.Equal(t, "test-proj - asia-northeast1-c - 6724404429462225363", frames[0].Fields[1].Name)
-			})
+			frames, err := res.Dataframes.Decoded()
+			require.NoError(t, err)
+			assert.Equal(t, "test-proj - asia-northeast1-c - 6724404429462225363", frames[0].Fields[1].Name)
 		})
 	})
 
