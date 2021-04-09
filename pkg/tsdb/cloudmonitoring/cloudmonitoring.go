@@ -602,7 +602,11 @@ func addConfigData(frames data.Frames, dl string, unit string) data.Frames {
 			URL:         dl,
 		}
 		frames[i].Fields[1].Config.Links = append(frames[i].Fields[1].Config.Links, deepLink)
-		frames[i].Fields[1].Config.Unit = unit
+		if len(unit) > 0 {
+			if val, ok := cloudMonitoringUnitMappings[unit]; ok {
+				frames[i].Fields[1].Config.Unit = val
+			}
+		}
 	}
 	return frames
 }
