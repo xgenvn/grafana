@@ -134,7 +134,7 @@ export function Metrics(props: Props) {
             placeholder="Select Services"
           ></Select>
         </InlineField>
-        <InlineField className="width-20" label="Metric">
+        <InlineField className="width-20" label="Metric name">
           <Select
             onChange={onMetricTypeChange}
             value={[...metrics, ...templateVariableOptions].find((s) => s.value === metricType)}

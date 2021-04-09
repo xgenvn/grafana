@@ -3,7 +3,7 @@ import { alignOptions, aggOptions, systemLabels } from './constants';
 import { SelectableValue } from '@grafana/data';
 import CloudMonitoringDatasource from './datasource';
 import { TemplateSrv, getTemplateSrv } from '@grafana/runtime';
-import { MetricDescriptor, MetricQuery, ValueTypes, MetricKind } from './types';
+import { MetricDescriptor, ValueTypes, MetricKind, AlignmentTypes, PreprocessorType } from './types';
 
 const templateSrv: TemplateSrv = getTemplateSrv();
 
@@ -34,7 +34,15 @@ export const getMetricTypes = (
   };
 };
 
-export const getAlignmentOptionsByMetric = (metricValueType: string, metricKind: string) => {
+export const getAlignmentOptionsByMetric = (
+  metricValueType: string,
+  metricKind: string,
+  preprocessor?: PreprocessorType
+) => {
+  if (preprocessor && preprocessor === PreprocessorType.Rate) {
+    metricKind = MetricKind.GAUGE;
+  }
+
   return !metricValueType
     ? []
     : alignOptions.filter((i) => {
@@ -63,19 +71,24 @@ export const getLabelKeys = async (
   return [...Object.keys(labels), ...systemLabels];
 };
 
-export const getAlignmentPickerData = ({ valueType, metricKind, perSeriesAligner }: Partial<MetricQuery>) => {
-  const alignOptions = getAlignmentOptionsByMetric(valueType!, metricKind!).map((option) => ({
+export const getAlignmentPickerData = (
+  valueType: string | undefined = ValueTypes.DOUBLE,
+  metricKind: string | undefined = MetricKind.GAUGE,
+  perSeriesAligner: string | undefined = AlignmentTypes.ALIGN_MEAN,
+  preprocessor?: PreprocessorType
+) => {
+  const alignOptions = getAlignmentOptionsByMetric(valueType!, metricKind!, preprocessor!).map((option) => ({
     ...option,
     label: option.text,
   }));
-  if (!alignOptions.some((o: { value: string }) => o.value === templateSrv.replace(perSeriesAligner!))) {
-    perSeriesAligner = alignOptions.length > 0 ? alignOptions[0].value : '';
+  if (!alignOptions.some((o: { value: string }) => o.value === templateSrv.replace(perSeriesAligner))) {
+    perSeriesAligner = alignOptions.length > 0 ? alignOptions[0].value : AlignmentTypes.ALIGN_MEAN;
   }
   return { alignOptions, perSeriesAligner };
 };
 
-export const labelsToGroupedOptions = (groupBys: string[]) => {
-  const groups = groupBys.reduce((acc: any, curr: string) => {
+export const labelsToGroupedOptions = (labels: string[]): Array<SelectableValue<string>> => {
+  const groups = labels.reduce((acc: any, curr: string) => {
     const arr = curr.split('.').map(_.startCase);
     const group = (arr.length === 2 ? arr : _.initial(arr)).join(' ');
     const option = {

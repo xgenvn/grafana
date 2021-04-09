@@ -1,6 +1,6 @@
 import React from 'react';
 import { Metrics, LabelFilter, GroupBy, Preprocessor, Alignment } from '.';
-import { MetricQuery, MetricDescriptor, PreprocessorType } from '../types';
+import { MetricQuery, MetricDescriptor } from '../types';
 import CloudMonitoringDatasource from '../datasource';
 import { SelectableValue } from '@grafana/data';
 
@@ -40,11 +40,7 @@ function Editor({
             onChange={(filters) => onChange({ ...query, filters })}
             variableOptionGroup={variableOptionGroup}
           />
-          <Preprocessor
-            metricDescriptor={metric}
-            preprocessor={query.preprocessor}
-            onChange={(preprocessor: PreprocessorType) => onChange({ ...query, preprocessor })}
-          />
+          <Preprocessor metricDescriptor={metric} query={query} onChange={onChange} />
           <GroupBy
             labels={Object.keys(labels)}
             query={query}

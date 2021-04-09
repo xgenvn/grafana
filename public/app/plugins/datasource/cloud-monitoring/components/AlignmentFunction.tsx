@@ -12,7 +12,11 @@ export interface Props {
 }
 
 export const AlignmentFunction: FC<Props> = ({ query, templateVariableOptions, onChange }) => {
-  const { perSeriesAligner, alignOptions } = useMemo(() => getAlignmentPickerData(query), [query]);
+  const { valueType, metricKind, perSeriesAligner: psa, preprocessor } = query;
+  const { perSeriesAligner, alignOptions } = useMemo(
+    () => getAlignmentPickerData(valueType, metricKind, psa, preprocessor),
+    [valueType, metricKind, psa, preprocessor]
+  );
 
   return (
     <>

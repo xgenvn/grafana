@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Project, VisualMetricQueryEditor, AliasBy } from '.';
-import { MetricQuery, MetricDescriptor, EditorMode, MetricKind, PreprocessorType } from '../types';
+import { MetricQuery, MetricDescriptor, EditorMode, MetricKind, PreprocessorType, AlignmentTypes } from '../types';
 import { getAlignmentPickerData } from '../functions';
 import CloudMonitoringDatasource from '../datasource';
 import { SelectableValue } from '@grafana/data';
@@ -34,12 +34,12 @@ export const defaultQuery: (dataSource: CloudMonitoringDatasource) => MetricQuer
   unit: '',
   crossSeriesReducer: 'REDUCE_MEAN',
   alignmentPeriod: 'cloud-monitoring-auto',
-  perSeriesAligner: 'ALIGN_MEAN',
+  perSeriesAligner: AlignmentTypes.ALIGN_MEAN,
   groupBys: [],
   filters: [],
   aliasBy: '',
   query: '',
-  preprocessing: PreprocessorType.None,
+  preprocessor: PreprocessorType.None,
 });
 
 function Editor({
@@ -62,31 +62,34 @@ function Editor({
     }
   }, [datasource, groupBys, metricType, projectName, refId]);
 
-  const onChange = (metricQuery: MetricQuery) => {
-    onQueryChange({ ...query, ...metricQuery });
-    onRunQuery();
-  };
+  const onChange = useCallback(
+    (metricQuery: MetricQuery) => {
+      onQueryChange({ ...query, ...metricQuery });
+      onRunQuery();
+    },
+    [onQueryChange, onRunQuery, query]
+  );
 
-  const onMetricTypeChange = async ({ valueType, metricKind, type, unit }: MetricDescriptor) => {
-    const { perSeriesAligner, alignOptions } = getAlignmentPickerData({
-      valueType,
-      metricKind,
-      perSeriesAligner: state.perSeriesAligner,
-    });
-    setState({
-      ...state,
-      alignOptions,
-    });
-    onChange({
-      ...query,
-      perSeriesAligner,
-      metricType: type,
-      unit,
-      valueType,
-      metricKind,
-      preprocessor: metricKind !== query?.metricKind ? PreprocessorType.None : query.preprocessor,
-    });
-  };
+  const onMetricTypeChange = useCallback(
+    () => ({ valueType, metricKind, type, unit }: MetricDescriptor) => {
+      const { perSeriesAligner, alignOptions } = getAlignmentPickerData(valueType, metricKind, state.perSeriesAligner);
+
+      setState({
+        ...state,
+        alignOptions,
+      });
+      onChange({
+        ...query,
+        perSeriesAligner,
+        metricType: type,
+        unit,
+        valueType,
+        metricKind,
+        preprocessor: metricKind !== query?.metricKind ? PreprocessorType.None : query.preprocessor,
+      });
+    },
+    [onChange, query, state]
+  );
 
   return (
     <>

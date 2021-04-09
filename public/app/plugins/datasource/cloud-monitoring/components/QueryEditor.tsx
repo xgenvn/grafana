@@ -3,10 +3,10 @@ import appEvents from 'app/core/app_events';
 import { css } from '@emotion/css';
 import { CoreEvents } from 'app/types';
 import { ExploreQueryFieldProps } from '@grafana/data';
-import { Button, InlineFields, RadioButtonGroup } from '@grafana/ui';
+import { Button, InlineFields, Select } from '@grafana/ui';
 import { Help, MetricQueryEditor, SLOQueryEditor, QueryEditorContainer } from './';
 import { CloudMonitoringQuery, MetricQuery, QueryType, SLOQuery, queryTypes, EditorMode } from '../types';
-import { LABEL_WIDTH } from '../constants';
+import { LABEL_WIDTH, SELECT_WIDTH } from '../constants';
 import { defaultQuery } from './MetricQueryEditor';
 import { defaultQuery as defaultSLOQuery } from './SLO/SLOQueryEditor';
 import { formatCloudMonitoringError, toOption } from '../functions';
@@ -80,10 +80,11 @@ export class QueryEditor extends PureComponent<Props, State> {
     return (
       <QueryEditorContainer>
         <InlineFields label="Query Type" transparent labelWidth={LABEL_WIDTH}>
-          <RadioButtonGroup
+          <Select
+            width={SELECT_WIDTH}
             value={queryType}
             options={queryTypes}
-            onChange={(value) => {
+            onChange={({ value }) => {
               onChange({ ...query, sloQuery, queryType: value! });
               onRunQuery();
             }}
