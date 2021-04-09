@@ -159,8 +159,6 @@ func (e *Executor) executeTimeSeriesQuery(ctx context.Context, tsdbQuery plugins
 		return plugins.DataResponse{}, err
 	}
 
-	unit := e.resolvePanelUnitFromQueries(queryExecutors)
-
 	for _, queryExecutor := range queryExecutors {
 		queryRes, resp, executedQueryString, err := queryExecutor.run(ctx, tsdbQuery, e)
 		if err != nil {
@@ -172,41 +170,9 @@ func (e *Executor) executeTimeSeriesQuery(ctx context.Context, tsdbQuery plugins
 		}
 
 		result.Results[queryExecutor.getRefID()] = queryRes
-
-		if len(unit) > 0 {
-			frames, _ := queryRes.Dataframes.Decoded()
-			for i := range frames {
-				if frames[i].Fields[1].Config == nil {
-					frames[i].Fields[1].Config = &data.FieldConfig{}
-				}
-				frames[i].Fields[1].Config.Unit = unit
-			}
-			queryRes.Dataframes = plugins.NewDecodedDataFrames(frames)
-		}
-		result.Results[queryExecutor.getRefID()] = queryRes
 	}
 
 	return result, nil
-}
-
-func (e *Executor) resolvePanelUnitFromQueries(executors []cloudMonitoringQueryExecutor) string {
-	if len(executors) == 0 {
-		return ""
-	}
-	unit := executors[0].getUnit()
-	if len(executors) > 1 {
-		for _, query := range executors[1:] {
-			if query.getUnit() != unit {
-				return ""
-			}
-		}
-	}
-	if len(unit) > 0 {
-		if val, ok := cloudMonitoringUnitMappings[unit]; ok {
-			return val
-		}
-	}
-	return ""
 }
 
 func (e *Executor) buildQueryExecutors(tsdbQuery plugins.DataQuery) ([]cloudMonitoringQueryExecutor, error) {
@@ -285,7 +251,6 @@ func (e *Executor) buildQueryExecutors(tsdbQuery plugins.DataQuery) ([]cloudMoni
 		target = params.Encode()
 		cmtsf.Target = target
 		cmtsf.Params = params
-		cmtsf.Unit = q.MetricQuery.Unit
 
 		if setting.Env == setting.Dev {
 			slog.Debug("CloudMonitoring request", "params", params)
@@ -381,7 +346,9 @@ func setMetricAggParams(params *url.Values, query *metricQuery, durationSeconds 
 
 	alignmentPeriod := calculateAlignmentPeriod(query.AlignmentPeriod, intervalMs, durationSeconds)
 
-	if query.PreprocessorType == PreprocessorTypeDelta || query.PreprocessorType == PreprocessorTypeRate {
+	// In case a preprocessor is defined, the preprocessor becomes the primary aggregation
+	// and the aggregation that is specified in the UI becomes the secondary aggregation
+	if query.PreprocessorType != PreprocessorTypeNone {
 		params.Add("secondaryAggregation.alignmentPeriod", alignmentPeriod)
 		params.Add("aggregation.crossSeriesReducer", crossSeriesReducerDefault)
 		params.Add("secondaryAggregation.crossSeriesReducer", query.CrossSeriesReducer)
@@ -624,7 +591,7 @@ func unmarshalResponse(res *http.Response) (cloudMonitoringResponse, error) {
 	return data, nil
 }
 
-func addConfigData(frames data.Frames, dl string) data.Frames {
+func addConfigData(frames data.Frames, dl string, unit string) data.Frames {
 	for i := range frames {
 		if frames[i].Fields[1].Config == nil {
 			frames[i].Fields[1].Config = &data.FieldConfig{}
@@ -635,6 +602,7 @@ func addConfigData(frames data.Frames, dl string) data.Frames {
 			URL:         dl,
 		}
 		frames[i].Fields[1].Config.Links = append(frames[i].Fields[1].Config.Links, deepLink)
+		frames[i].Fields[1].Config.Unit = unit
 	}
 	return frames
 }
