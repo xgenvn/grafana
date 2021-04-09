@@ -2,10 +2,10 @@ import React, { FC } from 'react';
 import _ from 'lodash';
 
 import { SelectableValue } from '@grafana/data';
-import { InlineFields } from '@grafana/ui';
+import { InlineField, InlineFields } from '@grafana/ui';
 import { LABEL_WIDTH } from '../constants';
 import { MetricQuery } from '../types';
-import { AlignmentFunction, AlignmentPeriods } from '.';
+import { AlignmentFunction, AlignmentPeriod } from '.';
 
 export interface Props {
   onChange: (query: MetricQuery) => void;
@@ -23,12 +23,14 @@ export const Alignment: FC<Props> = ({ templateVariableOptions, onChange, query,
       tooltip="The process of alignment consists of collecting all data points received in a fixed length of time, applying a function to combine those data points, and assigning a timestamp to the result."
     >
       <AlignmentFunction templateVariableOptions={templateVariableOptions} query={query} onChange={onChange} />
-      <AlignmentPeriods
-        templateVariableOptions={templateVariableOptions}
-        query={query}
-        usedAlignmentPeriod={usedAlignmentPeriod}
-        onChange={onChange}
-      />
+      <InlineField label="Period" className="width-16">
+        <AlignmentPeriod
+          templateVariableOptions={templateVariableOptions}
+          query={query}
+          usedAlignmentPeriod={usedAlignmentPeriod}
+          onChange={onChange}
+        />
+      </InlineField>
     </InlineFields>
   );
 };

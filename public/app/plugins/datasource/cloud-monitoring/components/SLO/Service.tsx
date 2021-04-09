@@ -3,7 +3,7 @@ import { InlineFields, Select } from '@grafana/ui';
 import { SelectableValue } from '@grafana/data';
 import CloudMonitoringDatasource from '../../datasource';
 import { SLOQuery } from '../../types';
-import { LABEL_WIDTH } from '../../constants';
+import { LABEL_WIDTH, SELECT_WIDTH } from '../../constants';
 
 export interface Props {
   onChange: (query: SLOQuery) => void;
@@ -14,13 +14,14 @@ export interface Props {
 
 export const Service: React.FC<Props> = ({ query, templateVariableOptions, onChange, datasource }) => {
   const [services, setServices] = useState<Array<SelectableValue<string>>>([]);
+  const { projectName } = query;
 
   useEffect(() => {
-    if (!query.projectName) {
+    if (!projectName) {
       return;
     }
 
-    datasource.getSLOServices(query.projectName).then((services: Array<SelectableValue<string>>) => {
+    datasource.getSLOServices(projectName).then((services: Array<SelectableValue<string>>) => {
       setServices([
         {
           label: 'Template Variables',
@@ -29,13 +30,14 @@ export const Service: React.FC<Props> = ({ query, templateVariableOptions, onCha
         ...services,
       ]);
     });
-  }, [datasource, query, templateVariableOptions]);
+  }, [datasource, projectName, templateVariableOptions]);
 
   return (
     <InlineFields label="Service" grow transparent labelWidth={LABEL_WIDTH}>
       <Select
+        width={SELECT_WIDTH}
         allowCustomValue
-        value={{ value: query?.serviceId, label: query?.serviceName || query?.serviceId }}
+        value={query?.serviceId && { value: query?.serviceId, label: query?.serviceName || query?.serviceId }}
         placeholder="Select service"
         options={services}
         onChange={({ value: serviceId = '', label: serviceName = '' }) =>

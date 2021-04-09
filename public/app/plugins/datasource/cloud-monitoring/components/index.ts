@@ -6,7 +6,7 @@ export { Alignment } from './Alignment';
 export { LabelFilter } from './LabelFilter';
 export { AnnotationsHelp } from './AnnotationsHelp';
 export { AlignmentFunction } from './AlignmentFunction';
-export { AlignmentPeriods } from './AlignmentPeriods';
+export { AlignmentPeriod } from './AlignmentPeriod';
 export { AliasBy } from './AliasBy';
 export { Aggregations } from './Aggregations';
 export { MetricQueryEditor } from './MetricQueryEditor';
