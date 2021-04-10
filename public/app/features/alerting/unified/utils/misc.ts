@@ -1,5 +1,5 @@
 import { config } from '@grafana/runtime';
-import { urlUtil } from '@grafana/data';
+import { urlUtil, UrlQueryMap } from '@grafana/data';
 
 export function createExploreLink(dataSourceName: string, query: string) {
   return urlUtil.renderUrl(config.appSubUrl + '/explore', {
@@ -26,3 +26,11 @@ export function hash(value: string): number {
   }
   return hash;
 }
+
+export const getFiltersFromUrlParams = (queryParams: UrlQueryMap) => {
+  const queryString = queryParams['queryString'] === undefined ? undefined : String(queryParams['queryString']);
+  const alertState = queryParams['alertState'] === undefined ? undefined : String(queryParams['alertState']);
+  const dataSource = queryParams['dataSource'] === undefined ? undefined : String(queryParams['dataSource']);
+
+  return { queryString, alertState, dataSource };
+};
