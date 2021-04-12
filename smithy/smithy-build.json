@@ -1,0 +1,10 @@
+{
+  "version": "1.0",
+  "plugins": {
+    "software.amazon.smithy.go.codegen.GoCodegenPlugin": {
+      "service": "grafana#Grafana",
+      "module": "grafana",
+      "moduleVersion": "0.0.1"
+    }
+  }
+}
