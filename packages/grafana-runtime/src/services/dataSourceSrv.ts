@@ -54,6 +54,9 @@ export interface GetDataSourceListFilters {
 
   /** filter list by plugin  */
   pluginId?: string;
+
+  /** Only return data sources that support alerting */
+  alerting?: boolean;
 }
 
 let singletonInstance: DataSourceSrv;

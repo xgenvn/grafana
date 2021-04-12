@@ -20,6 +20,7 @@ export interface DataSourcePickerProps {
   autoFocus?: boolean;
   openMenuOnFocus?: boolean;
   placeholder?: string;
+  alerting?: boolean;
   tracing?: boolean;
   mixed?: boolean;
   dashboard?: boolean;
@@ -106,9 +107,10 @@ export class DataSourcePicker extends PureComponent<DataSourcePickerProps, DataS
   }
 
   getDataSourceOptions() {
-    const { tracing, metrics, mixed, dashboard, variables, annotations, pluginId } = this.props;
+    const { alerting, tracing, metrics, mixed, dashboard, variables, annotations, pluginId } = this.props;
     const options = this.dataSourceSrv
       .getList({
+        alerting,
         tracing,
         metrics,
         dashboard,
