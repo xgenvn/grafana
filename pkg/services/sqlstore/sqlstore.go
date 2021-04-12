@@ -422,6 +422,12 @@ func InitTestDB(t ITestDB, opts ...InitTestDBOpt) *SQLStore {
 			dbType = db
 		}
 
+		// useful if you already have a database that you want to use for tests
+		if _, present := os.LookupEnv("SKIP_MIGRATIONS"); present {
+			t.Log("Skipping database migrations")
+			testSQLStore.dbCfg.SkipMigrations = true
+		}
+
 		// set test db config
 		testSQLStore.Cfg = setting.NewCfg()
 		sec, err := testSQLStore.Cfg.Raw.NewSection("database")
