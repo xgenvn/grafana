@@ -1,9 +1,11 @@
 import React, { FC } from 'react';
+import { GrafanaTheme } from '@grafana/data';
 import { css, cx } from '@emotion/css';
+import { useTheme } from '../../themes';
 import { InlineLabel } from './InlineLabel';
 import { Props as InlineFieldProps } from './InlineField';
 
-export interface Props extends Omit<InlineFieldProps, 'children'> {
+export interface Props extends Omit<InlineFieldProps, 'children' | 'invalid' | 'disabled' | 'loading'> {
   children: React.ReactNode;
 }
 
@@ -12,15 +14,13 @@ export const InlineFields: FC<Props> = ({
   label,
   tooltip,
   labelWidth = 'auto',
-  invalid,
-  loading,
-  disabled,
   className,
   grow,
   transparent,
   ...htmlProps
 }) => {
-  const styles = getStyles(grow);
+  const theme = useTheme();
+  const styles = getStyles(theme, grow);
 
   const labelElement =
     typeof label === 'string' ? (
@@ -41,7 +41,7 @@ export const InlineFields: FC<Props> = ({
 
 InlineFields.displayName = 'InlineFields';
 
-const getStyles = (grow?: boolean) => {
+const getStyles = (theme: GrafanaTheme, grow?: boolean) => {
   return {
     container: css`
       display: flex;
@@ -50,6 +50,7 @@ const getStyles = (grow?: boolean) => {
       text-align: left;
       position: relative;
       flex: ${grow ? 1 : 0} 0 auto;
+      margin: 0 0 ${theme.spacing.xs} 0;
       > * {
         margin-bottom: 0 !important;
       }

@@ -71,6 +71,7 @@ export const LabelFilter: FunctionComponent<Props> = ({
             <Select
               width={SELECT_WIDTH}
               allowCustomValue
+              formatCreateLabel={(v) => `Use label key: ${v}`}
               value={key}
               options={options}
               onChange={({ value: key = '' }) => {
@@ -92,6 +93,7 @@ export const LabelFilter: FunctionComponent<Props> = ({
             />
             <Select
               width={SELECT_WIDTH}
+              formatCreateLabel={(v) => `Use label value: ${v}`}
               allowCustomValue
               value={value}
               placeholder="add filter value"

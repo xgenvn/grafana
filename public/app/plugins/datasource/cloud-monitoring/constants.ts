@@ -1,6 +1,6 @@
 import { MetricKind, ValueTypes } from './types';
 
-export const LABEL_WIDTH = 18;
+export const LABEL_WIDTH = 16;
 export const SELECT_WIDTH = 32;
 
 export const alignOptions = [
