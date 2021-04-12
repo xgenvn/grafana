@@ -176,6 +176,9 @@ export class DatasourceSrv implements DataSourceService {
       if (filters.pluginId && x.meta.id !== filters.pluginId) {
         return false;
       }
+      if (filters.type && (Array.isArray(filters.type) ? !filters.type.includes(x.type) : filters.type !== x.type)) {
+        return false;
+      }
       if (
         !filters.all &&
         x.meta.metrics !== true &&

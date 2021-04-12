@@ -25,6 +25,7 @@ export interface DataSourcePickerProps {
   mixed?: boolean;
   dashboard?: boolean;
   metrics?: boolean;
+  type?: string | string[];
   annotations?: boolean;
   variables?: boolean;
   pluginId?: string;
@@ -107,7 +108,7 @@ export class DataSourcePicker extends PureComponent<DataSourcePickerProps, DataS
   }
 
   getDataSourceOptions() {
-    const { alerting, tracing, metrics, mixed, dashboard, variables, annotations, pluginId } = this.props;
+    const { alerting, tracing, metrics, mixed, dashboard, variables, annotations, pluginId, type } = this.props;
     const options = this.dataSourceSrv
       .getList({
         alerting,
@@ -118,6 +119,7 @@ export class DataSourcePicker extends PureComponent<DataSourcePickerProps, DataS
         variables,
         annotations,
         pluginId,
+        type,
       })
       .map((ds) => ({
         value: ds.name,

@@ -57,6 +57,9 @@ export interface GetDataSourceListFilters {
 
   /** Only return data sources that support alerting */
   alerting?: boolean;
+
+  /** Only returns datasources matching the specified types (ie. Loki, Prometheus) */
+  type?: string | string[];
 }
 
 let singletonInstance: DataSourceSrv;
