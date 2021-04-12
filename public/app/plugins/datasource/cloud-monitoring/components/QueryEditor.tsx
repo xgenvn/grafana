@@ -2,12 +2,12 @@ import React, { PureComponent } from 'react';
 import { css } from '@emotion/css';
 import { ExploreQueryFieldProps } from '@grafana/data';
 import { Button, InlineFields, Select } from '@grafana/ui';
-import { Help, MetricQueryEditor, SLOQueryEditor, QueryEditorContainer } from './';
+import { MetricQueryEditor, SLOQueryEditor, QueryEditorContainer } from './';
 import { CloudMonitoringQuery, MetricQuery, QueryType, SLOQuery, queryTypes, EditorMode } from '../types';
 import { LABEL_WIDTH, SELECT_WIDTH } from '../constants';
 import { defaultQuery } from './MetricQueryEditor';
 import { defaultQuery as defaultSLOQuery } from './SLO/SLOQueryEditor';
-import { formatCloudMonitoringError, toOption } from '../functions';
+import { toOption } from '../functions';
 import CloudMonitoringDatasource from '../datasource';
 
 export type Props = ExploreQueryFieldProps<CloudMonitoringDatasource, CloudMonitoringQuery>;
@@ -50,8 +50,6 @@ export class QueryEditor extends PureComponent<Props> {
       expanded: false,
       options: datasource.getVariables().map(toOption),
     };
-    const error = this.props.data?.error;
-    console.log({ error2: formatCloudMonitoringError(error) });
 
     return (
       <QueryEditorContainer>
