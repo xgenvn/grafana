@@ -1,7 +1,5 @@
 import React, { PureComponent } from 'react';
-import appEvents from 'app/core/app_events';
 import { css } from '@emotion/css';
-import { CoreEvents } from 'app/types';
 import { ExploreQueryFieldProps } from '@grafana/data';
 import { Button, InlineFields, Select } from '@grafana/ui';
 import { Help, MetricQueryEditor, SLOQueryEditor, QueryEditorContainer } from './';
@@ -14,13 +12,7 @@ import CloudMonitoringDatasource from '../datasource';
 
 export type Props = ExploreQueryFieldProps<CloudMonitoringDatasource, CloudMonitoringQuery>;
 
-interface State {
-  lastQueryError: string;
-}
-
-export class QueryEditor extends PureComponent<Props, State> {
-  state: State = { lastQueryError: '' };
-
+export class QueryEditor extends PureComponent<Props> {
   async UNSAFE_componentWillMount() {
     const { datasource, query } = this.props;
 
@@ -41,24 +33,6 @@ export class QueryEditor extends PureComponent<Props, State> {
     }
   }
 
-  componentDidMount() {
-    appEvents.on(CoreEvents.dsRequestError, this.onDataError.bind(this));
-    appEvents.on(CoreEvents.dsRequestResponse, this.onDataResponse.bind(this));
-  }
-
-  componentWillUnmount() {
-    appEvents.off(CoreEvents.dsRequestResponse, this.onDataResponse.bind(this));
-    appEvents.off(CoreEvents.dsRequestError, this.onDataError.bind(this));
-  }
-
-  onDataResponse() {
-    this.setState({ lastQueryError: '' });
-  }
-
-  onDataError(error: any) {
-    this.setState({ lastQueryError: formatCloudMonitoringError(error) });
-  }
-
   onQueryChange(prop: string, value: any) {
     this.props.onChange({ ...this.props.query, [prop]: value });
     this.props.onRunQuery();
@@ -76,6 +50,8 @@ export class QueryEditor extends PureComponent<Props, State> {
       expanded: false,
       options: datasource.getVariables().map(toOption),
     };
+    const error = this.props.data?.error;
+    console.log({ error2: formatCloudMonitoringError(error) });
 
     return (
       <QueryEditorContainer>
@@ -133,11 +109,6 @@ export class QueryEditor extends PureComponent<Props, State> {
             query={sloQuery}
           ></SLOQueryEditor>
         )}
-
-        <Help
-          rawQuery={decodeURIComponent(meta?.executedQueryString ?? '')}
-          lastQueryError={this.state.lastQueryError}
-        />
       </QueryEditorContainer>
     );
   }
