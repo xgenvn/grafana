@@ -98,6 +98,7 @@ func generateConnectionString(dataSource *models.DataSource) (string, error) {
 	certificate := dataSource.JsonData.Get("certificate").MustString("")
 	connStr := fmt.Sprintf("server=%s;port=%s;database=%s;user id=%s;password=%s;",
 		addr.Host,
+		addr.Port,
 		dataSource.Database,
 		dataSource.User,
 		dataSource.DecryptedPassword(),
@@ -116,8 +117,6 @@ func generateConnectionString(dataSource *models.DataSource) (string, error) {
 			connStr += fmt.Sprintf("certificate=%s;", certificate)
 		}
 	}
-
-	logger.Info("Connecting", "connection", connStr)
 	return connStr, nil
 }
 
